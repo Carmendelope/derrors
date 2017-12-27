@@ -7,6 +7,10 @@ package derrors
 
 // InvalidEntity message indicating that the associated entity cannot be validated.
 const InvalidEntity = "invalid entity, check mandatory fields"
+// MarshalError message to indicate errors with the json.Marshal operation.
+const MarshalError = "cannot marshal structure"
+// UnmarshalError message to indicate errors with the json.Unmarshal operation.
+const UnmarshalError = "cannot unmarshal structure"
 
 // MissingNetwork message indicating that the request requires a target network.
 const MissingNetwork = "missing target network"

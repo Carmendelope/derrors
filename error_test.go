@@ -11,10 +11,10 @@ import (
 
 func TestGetStackTrace(t *testing.T) {
     stackTrace := GetStackTrace()
-    AssertTrue(t, len(stackTrace) > 0, "expecting stack")
+    assertTrue(t, len(stackTrace) > 0, "expecting stack")
     parent := stackTrace[0]
     parentFunctionName := strings.Split(parent.FunctionName, ".")[2]
-    AssertEquals(t, "TestGetStackTrace",
+    assertEquals(t, "TestGetStackTrace",
         parentFunctionName, "Expecting parent function")
 }
 
@@ -29,17 +29,17 @@ func (ss * testPrettyStruct) String() string {
 func TestPrettyPrintStruct(t *testing.T) {
     basicElement := "string"
     r1 := PrettyPrintStruct(basicElement)
-    AssertEquals(t, "\"string\"", r1, "expecting same message")
+    assertEquals(t, "\"string\"", r1, "expecting same message")
     type basicStruct struct {
         msg string
     }
     structElement := &basicStruct{"string2"}
     r2 := PrettyPrintStruct(structElement)
-    AssertEquals(t, "&derrors.basicStruct{msg:\"string2\"}", r2, "expecting struct message")
+    assertEquals(t, "&derrors.basicStruct{msg:\"string2\"}", r2, "expecting struct message")
 
     stringElement := &testPrettyStruct{"PRINT"}
     r3 := PrettyPrintStruct(stringElement)
-    AssertEquals(t, "PRETTY PRINT", r3, "expecting pretty print")
+    assertEquals(t, "PRETTY PRINT", r3, "expecting pretty print")
 
 
 }

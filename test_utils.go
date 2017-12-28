@@ -6,8 +6,8 @@
 package derrors
 
 import (
-    "testing"
     "reflect"
+    "testing"
 )
 
 // AssertEquals utility function for the tests to avoid external dependencies.

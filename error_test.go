@@ -75,3 +75,16 @@ func TestEntityError(t *testing.T) {
     fmt.Println(detailedError)
     fmt.Println("Error(): " + e.Error())
 }
+
+func TestAsDaishoError(t *testing.T) {
+    err := errors.New("some golang error")
+    derror := AsDaishoError(err, "msg")
+    assertEquals(t, "msg", derror.Message, "Expecting message")
+
+    derrorFromNil := AsDaishoError(nil, "msg")
+    assertTrue(t, derrorFromNil == nil, "Should be nil")
+
+    derrorWithParam := AsDaishoError(err, "msg").WithParams("param1")
+    assertTrue(t, derrorWithParam != nil, "should not be nil")
+    assertEquals(t, 1, len(derrorWithParam.Parameters), "expecting one parameter")
+}

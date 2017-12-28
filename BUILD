@@ -27,6 +27,9 @@ go_library(
 
 go_test(
     name = "go_default_test",
-    srcs = ["error_test.go"],
+    srcs = [
+        "error_test.go",
+        "json_test.go",
+    ],
     library = ":go_default_library",
 )

@@ -13,6 +13,8 @@ const GenericErrorType ErrorType = "GenericError"
 const ConnectionErrorType ErrorType = "Connection"
 // EntityErrorType is associated with entity related errors including validation, association, etc.
 const EntityErrorType ErrorType = "Entity"
+// OperationErrorType is associated with failures in external operations.
+const OperationErrorType ErrorType = "Operation"
 // ProviderErrorType is associated with provider related errors including invalid operations, provider failures, etc.
 const ProviderErrorType ErrorType = "Provider"
 // OrchestrationErrorType is associated with orchestration related errors including orchestration failures, preconditions, etc.
@@ -29,6 +31,7 @@ func ValidErrorType(errorType ErrorType) bool {
     case GenericErrorType : return true
     case ConnectionErrorType : return true
     case EntityErrorType : return true
+    case OperationErrorType : return true
     case ProviderErrorType : return true
     case OrchestrationErrorType : return true
     default: return false

@@ -10,6 +10,26 @@ users and allowing deeper reporting of the errors for the developers at the same
 The DaishoError interfaces defines a set of basic methods that makes a DaishoError compatible with the GolangError but
 provides extra functions to track the error origin.
 
+## Building and testing
+
+To update the files, run:
+
+```
+'bazel run //:gazelle
+```
+
+To build the project, execute:
+
+```
+bazel build ...
+```
+
+To pass the tests,
+
+```
+bazel test ...
+```
+
 ## But wait, why not call it errors?
 
 We have intentionally avoided the errors package name to avoid conflicts with the golang error package.

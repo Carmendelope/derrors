@@ -12,8 +12,12 @@ import (
     "testing"
 )
 
+func callerGetStackTrace() []StackEntry {
+    return GetStackTrace()
+}
+
 func TestGetStackTrace(t *testing.T) {
-    stackTrace := GetStackTrace()
+    stackTrace := callerGetStackTrace()
     assertTrue(t, len(stackTrace) > 0, "expecting stack")
     parent := stackTrace[0]
     parentFunctionName := strings.Split(parent.FunctionName, ".")[2]
@@ -36,6 +40,11 @@ func TestNewGenericError(t *testing.T) {
 func TestNewEntityError(t *testing.T) {
     var err DaishoError = NewEntityError("entity", "msg")
     assertTrue(t, err != nil, "Expecting new error")
+}
+
+func TestNewOperationError(t *testing.T) {
+    var err DaishoError = NewOperationError("msg").WithParams("param1")
+    assertTrue(t, err != nil, "expecting new error")
 }
 
 func TestPrettyPrintStruct(t *testing.T) {
@@ -61,7 +70,7 @@ func TestEntityError(t *testing.T) {
     parent2 := errors.New("previous error")
     e := NewEntityError(basicEntity, IOError, parent, parent2)
     errorMsg := e.Error()
-    assertEquals(t, "[Entity] I/O error, entity: \"basicEntity\"", errorMsg, "Message should match")
+    assertEquals(t, "[Entity] I/O error", errorMsg, "Message should match")
     detailedError := e.DebugReport()
     fmt.Println(detailedError)
     fmt.Println("Error(): " + e.Error())

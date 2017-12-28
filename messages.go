@@ -15,6 +15,8 @@ const UnmarshalError = "cannot unmarshal structure"
 const IOError = "I/O error"
 // OpFail message to indicate that a complex operation has failed.
 const OpFail = "Operation failed"
+// MissingRESTParameter message to indicate that a required parameter is missing.
+const MissingRESTParameter = "Missing rest parameter"
 
 // MissingNetwork message indicating that the request requires a target network.
 const MissingNetwork = "missing target network"

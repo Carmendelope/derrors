@@ -13,6 +13,8 @@ const MarshalError = "cannot marshal structure"
 const UnmarshalError = "cannot unmarshal structure"
 // IOError message to indicate errors reading or writing data to sockets or persistent storage.
 const IOError = "I/O error"
+// OpFail message to indicate that a complex operation has failed.
+const OpFail = "Operation failed"
 
 // MissingNetwork message indicating that the request requires a target network.
 const MissingNetwork = "missing target network"

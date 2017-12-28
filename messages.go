@@ -19,7 +19,7 @@ const OpFail = "operation failed"
 const MissingRESTParameter = "missing rest parameter"
 // InvalidCondition message to indicate that a expected condition is not satisfied.
 const InvalidCondition = "invalid condition"
-// ConnectionError message to indicate that the communication with an external entity has failed.
+// HTTPConnectionError message to indicate that the communication with an external entity has failed.
 const HTTPConnectionError = "HTTP connection error"
 
 // MissingNetwork message indicating that the request requires a target network.

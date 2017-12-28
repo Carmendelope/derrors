@@ -225,3 +225,8 @@ func FromJSON(data [] byte) (DaishoError, error) {
     }
     return nil, errors.New("unsupported error type in conversion")
 }
+
+// IsDecoded checks that the required fields are decoded.
+func IsDecoded(err DaishoError) bool {
+    return err.Type() != ""
+}

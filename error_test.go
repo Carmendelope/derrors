@@ -2,11 +2,14 @@
 // Copyright (C) 2017 Daisho Group - All Rights Reserved
 //
 // Error tests
+
 package derrors
 
 import (
-    "testing"
+    "errors"
+    "fmt"
     "strings"
+    "testing"
 )
 
 func TestGetStackTrace(t *testing.T) {
@@ -25,6 +28,15 @@ func (ss * testPrettyStruct) String() string {
     return "PRETTY " + ss.msg
 }
 
+func TestNewGenericError(t *testing.T) {
+    var err DaishoError = NewGenericError("msg")
+    assertTrue(t, err != nil, "Expecting new error")
+}
+
+func TestNewEntityError(t *testing.T) {
+    var err DaishoError = NewEntityError("entity", "msg")
+    assertTrue(t, err != nil, "Expecting new error")
+}
 
 func TestPrettyPrintStruct(t *testing.T) {
     basicElement := "string"
@@ -41,5 +53,16 @@ func TestPrettyPrintStruct(t *testing.T) {
     r3 := PrettyPrintStruct(stringElement)
     assertEquals(t, "PRETTY PRINT", r3, "expecting pretty print")
 
+}
 
+func TestEntityError(t *testing.T) {
+    basicEntity := "basicEntity"
+    parent := errors.New("golang error")
+    parent2 := errors.New("previous error")
+    e := NewEntityError(basicEntity, IOError, parent, parent2)
+    errorMsg := e.Error()
+    assertEquals(t, "[Entity] I/O error, entity: \"basicEntity\"", errorMsg, "Message should match")
+    detailedError := e.DebugReport()
+    fmt.Println(detailedError)
+    fmt.Println("Error(): " + e.Error())
 }

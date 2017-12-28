@@ -11,6 +11,8 @@ const InvalidEntity = "invalid entity, check mandatory fields"
 const MarshalError = "cannot marshal structure"
 // UnmarshalError message to indicate errors with the json.Unmarshal operation.
 const UnmarshalError = "cannot unmarshal structure"
+// IOError message to indicate errors reading or writing data to sockets or persistent storage.
+const IOError = "I/O error"
 
 // MissingNetwork message indicating that the request requires a target network.
 const MissingNetwork = "missing target network"

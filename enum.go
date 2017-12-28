@@ -7,6 +7,8 @@ package derrors
 
 // ErrorType defines a new type for creating a enum of error types.
 type ErrorType string
+// GenericErrorType to be used with general errors.
+const GenericErrorType ErrorType = "GenericError"
 // ConnectionErrorType is associated with connectivity errors.
 const ConnectionErrorType ErrorType = "Connection"
 // EntityErrorType is associated with entity related errors including validation, association, etc.
@@ -24,6 +26,7 @@ const OrchestrationErrorType ErrorType = "Orchestration"
 func ValidErrorType(errorType ErrorType) bool {
     switch errorType {
     case "" : return false
+    case GenericErrorType : return true
     case ConnectionErrorType : return true
     case EntityErrorType : return true
     case ProviderErrorType : return true

@@ -88,3 +88,10 @@ func TestAsDaishoError(t *testing.T) {
     assertTrue(t, derrorWithParam != nil, "should not be nil")
     assertEquals(t, 1, len(derrorWithParam.Parameters), "expecting one parameter")
 }
+
+func TestCausedBy(t *testing.T) {
+    parent := NewOperationError("parent operation")
+    e := NewOperationError("current operation").CausedBy(parent)
+    assertTrue(t, e != nil, "Should not be nil")
+    assertTrue(t, e.Parent != nil, "Expecting parent")
+}

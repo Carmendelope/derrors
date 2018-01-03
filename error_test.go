@@ -68,7 +68,7 @@ func TestEntityError(t *testing.T) {
     basicEntity := "basicEntity"
     parent := errors.New("golang error")
     parent2 := errors.New("previous error")
-    e := NewEntityError(basicEntity, IOError, parent, parent2)
+    e := NewEntityError(basicEntity, "I/O error", parent, parent2)
     errorMsg := e.Error()
     assertEquals(t, "[Entity] I/O error", errorMsg, "Message should match")
     detailedError := e.DebugReport()

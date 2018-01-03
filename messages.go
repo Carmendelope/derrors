@@ -4,7 +4,7 @@
 // List of messages.
 
 package derrors
-
+/*
 // InvalidEntity message indicating that the associated entity cannot be validated.
 const InvalidEntity = "invalid entity, check mandatory fields"
 // MarshalError message to indicate errors with the json.Marshal operation.
@@ -73,3 +73,5 @@ const AppInstAlreadyExists = "application instance already exists"
 const AppInstAlreadyAttached = "application instance already attached to network"
 // AppInstNotAttachedToNetwork message indicating that the application instance is not attached to the given network.
 const AppInstNotAttachedToNetwork = "application instance not attached to network"
+
+*/

@@ -49,6 +49,8 @@ type GenericError struct {
     Parameters [] interface {} `json:"parameters"`
     // causes contains the list of causes of the error.
     Causes [] string `json:"causes"`
+    // Parent Daisho Error.
+    Parent DaishoError `json:"parent"`
     // stackTrace contains the calling stack trace.
     Stack [] StackEntry `json:"stackTrace"`
 }
@@ -60,12 +62,19 @@ func NewGenericError(msg string, causes ...error) * GenericError {
         msg,
         make([] interface{}, 0),
         ErrorsToString(causes),
+        nil,
         GetStackTrace()}
 }
 
 // WithParams permits to track extra parameters in the operation error.
 func (ge * GenericError) WithParams(params ... interface {}) * GenericError {
     ge.Parameters = append(ge.Parameters, params)
+    return ge
+}
+
+
+func (ge * GenericError) CausedBy(parent DaishoError) * GenericError {
+    ge.Parent = parent
     return ge
 }
 
@@ -81,6 +90,9 @@ func (ge * GenericError) StackToString() string {
 }
 
 func (ge * GenericError) paramsToString() string {
+    if len(ge.Parameters) == 0 {
+        return ""
+    }
     var buffer bytes.Buffer
     buffer.WriteString("Parameters:\n")
     for i, v := range ge.Parameters {
@@ -91,6 +103,9 @@ func (ge * GenericError) paramsToString() string {
 }
 
 func (ge * GenericError) causesToString() string {
+    if len(ge.Causes) == 0 {
+        return ""
+    }
     var buffer bytes.Buffer
     buffer.WriteString("Caused by:\n")
     for i, v := range ge.Causes {
@@ -120,6 +135,7 @@ func (ge * GenericError) StackTrace() [] StackEntry {
     return ge.Stack
 }
 
+
 // AsDaishoError checks an error. If it is nil, it returns nil, if not, it will create an equivalent GenericError
 func AsDaishoError(err error, msg string) * GenericError {
     if err != nil {
@@ -127,6 +143,8 @@ func AsDaishoError(err error, msg string) * GenericError {
     }
     return nil
 }
+
+
 
 // GetStackTrace retrieves the calling stack and transform that information into an array of StackEntry.
 func GetStackTrace() [] StackEntry {
@@ -178,6 +196,7 @@ func NewEntityError(entity interface{}, msg string, causes ...error) * GenericEr
             msg,
             params,
             ErrorsToString(causes),
+            nil,
             GetStackTrace()}
 }
 
@@ -193,6 +212,7 @@ func NewConnectionError(msg string, causes ...error) * GenericError {
             msg,
         make([] interface{}, 0),
             ErrorsToString(causes),
+            nil,
             GetStackTrace()}
 }
 
@@ -203,6 +223,7 @@ func NewOperationError(msg string, causes ... error) * GenericError {
             msg,
             make([] interface{}, 0),
             ErrorsToString(causes),
+            nil,
             GetStackTrace()}
 }
 

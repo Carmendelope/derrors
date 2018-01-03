@@ -72,7 +72,8 @@ func (ge * GenericError) WithParams(params ... interface {}) * GenericError {
     return ge
 }
 
-
+// CausedBy permits to link the error with a parent error. In this way, we can express the fact that a component
+// fails cause another component fails.
 func (ge * GenericError) CausedBy(parent DaishoError) * GenericError {
     ge.Parent = parent
     return ge

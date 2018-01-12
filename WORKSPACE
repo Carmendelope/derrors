@@ -1,6 +1,6 @@
 git_repository(
     name = "io_bazel_rules_go",
-    tag = "0.5.5",
+    tag = "0.8.1",
     remote = "https://github.com/bazelbuild/rules_go.git",
 )
 
@@ -11,6 +11,6 @@ go_repositories()
 git_repository(
     name = "io_bazel_rules_docker",
     remote = "https://github.com/bazelbuild/rules_docker.git",
-    tag = "v0.1.0",
+    tag = "v0.3.0",
 )
 

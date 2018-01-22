@@ -79,14 +79,14 @@ func TestEntityError(t *testing.T) {
 func TestAsDaishoError(t *testing.T) {
     err := errors.New("some golang error")
     derror := AsDaishoError(err, "msg")
-    assertEquals(t, "msg", derror.Message, "Expecting message")
+    assertEquals(t, "msg", derror.(*GenericError).Message, "Expecting message")
 
     derrorFromNil := AsDaishoError(nil, "msg")
     assertTrue(t, derrorFromNil == nil, "Should be nil")
 
-    derrorWithParam := AsDaishoError(err, "msg").WithParams("param1")
+    derrorWithParam := AsDaishoErrorWithParams(err, "msg", "param1")
     assertTrue(t, derrorWithParam != nil, "should not be nil")
-    assertEquals(t, 1, len(derrorWithParam.Parameters), "expecting one parameter")
+    assertEquals(t, 1, len(derrorWithParam.(*GenericError).Parameters), "expecting one parameter")
 }
 
 func TestCausedBy(t *testing.T) {
@@ -94,4 +94,14 @@ func TestCausedBy(t *testing.T) {
     e := NewOperationError("current operation").CausedBy(parent)
     assertTrue(t, e != nil, "Should not be nil")
     assertTrue(t, e.Parent != nil, "Expecting parent")
+}
+
+// AsDaishoError returned * GenericError instead of DaishoError creating a problem when evaluating
+// if the result is an error. assert.Nil reported the result as nil while err != nil failed.
+func TestDP1092(t *testing.T) {
+    //err need to be a DaishoError instead of a GenericError
+    var err = AsDaishoError(nil, "Testing conversion")
+    if err != nil {
+        t.Error("Should be nil")
+    }
 }

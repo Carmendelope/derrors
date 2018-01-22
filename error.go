@@ -148,13 +148,21 @@ func (ge * GenericError) StackTrace() [] StackEntry {
 
 
 // AsDaishoError checks an error. If it is nil, it returns nil, if not, it will create an equivalent GenericError
-func AsDaishoError(err error, msg string) * GenericError {
+func AsDaishoError(err error, msg string) DaishoError {
     if err != nil {
         return NewGenericError(msg, err)
     }
     return nil
 }
 
+// AsDaishoErrorWithParams checks an error. If it is nil, it returns nil, if not, it will create an equivalent
+// GenericError with a given set of parameters.
+func AsDaishoErrorWithParams(err error, msg string, params ... interface{}) DaishoError {
+    if err != nil {
+        return NewGenericError(msg, err).WithParams(params)
+    }
+    return nil
+}
 
 
 // GetStackTrace retrieves the calling stack and transform that information into an array of StackEntry.

@@ -30,12 +30,12 @@ type StackEntry struct {
 //     functionName The name of the calling function.
 //     file The name of the file where the function is located.
 //     line The line in the file.
-func NewStackEntry(functionName string, file string, line int) * StackEntry {
+func NewStackEntry(functionName string, file string, line int) *StackEntry {
     return &StackEntry{functionName, file, line}
 }
 
 // String returns the string representation of an StackEntry.
-func (se * StackEntry) String() string {
+func (se *StackEntry) String() string {
     return fmt.Sprintf("%s - %s:%d", se.FunctionName, se.File, se.Line)
 }
 
@@ -46,106 +46,124 @@ type GenericError struct {
     // Message contains the error message.
     Message string `json:"message"`
     // Parameters associated with error.
-    Parameters [] interface {} `json:"parameters"`
+    Parameters [] string `json:"parameters"`
     // causes contains the list of causes of the error.
     Causes [] string `json:"causes"`
     // Parent Daisho Error.
-    Parent DaishoError `json:"parent"`
+    Parent interface{} `json:"parent"`
     // stackTrace contains the calling stack trace.
     Stack [] StackEntry `json:"stackTrace"`
 }
 
 // NewGenericError returns a general purpose error.
-func NewGenericError(msg string, causes ...error) * GenericError {
+func NewGenericError(msg string, causes ...error) *GenericError {
     return &GenericError{
         GenericErrorType,
         msg,
-        make([] interface{}, 0),
+        make([]string, 0),
         ErrorsToString(causes),
         nil,
         GetStackTrace()}
 }
 
 // WithParams permits to track extra parameters in the operation error.
-func (ge * GenericError) WithParams(params ... interface {}) * GenericError {
-    ge.Parameters = append(ge.Parameters, params)
+func (ge *GenericError) WithParams(params ... interface{}) *GenericError {
+    for _, value := range params {
+        ser, err := json.Marshal(value)
+        if err != nil {
+            panic(err)
+        }
+        ge.Parameters = append(ge.Parameters, string(ser))
+    }
     return ge
 }
 
 // CausedBy permits to link the error with a parent error. In this way, we can express the fact that a component
 // fails cause another component fails.
-func (ge * GenericError) CausedBy(parent DaishoError) * GenericError {
+func (ge *GenericError) CausedBy(parent DaishoError) *GenericError {
     ge.Parent = parent
     return ge
 }
 
 // StackToString generates a string with a stack entry per line.
-func (ge * GenericError) StackToString() string {
+func (ge *GenericError) StackToString() string {
     var buffer bytes.Buffer
     buffer.WriteString("StackTrace:\n")
     for i, v := range ge.Stack {
-        sep := fmt.Sprintf("ST%d: ",i)
+        sep := fmt.Sprintf("ST%d: ", i)
         buffer.WriteString(sep + v.String() + "\n")
     }
     return buffer.String()
 }
 
-func (ge * GenericError) paramsToString() string {
+func (ge *GenericError) ParentError() (DaishoError, error) {
+    ser, err := json.Marshal(ge.Parent)
+    if err != nil {
+        return nil, err
+    }
+    return FromJSON(ser)
+}
+
+func (ge *GenericError) paramsToString() string {
     if len(ge.Parameters) == 0 {
         return ""
     }
     var buffer bytes.Buffer
     buffer.WriteString("Parameters:\n")
     for i, v := range ge.Parameters {
-        sep := fmt.Sprintf("P%d: ",i)
+        sep := fmt.Sprintf("P%d: ", i)
         buffer.WriteString(sep + PrettyPrintStruct(v) + "\n")
     }
     return buffer.String()
 }
 
-func (ge * GenericError) causesToString() string {
+func (ge *GenericError) causesToString() string {
     if len(ge.Causes) == 0 {
         return ""
     }
     var buffer bytes.Buffer
     buffer.WriteString("Caused by:\n")
     for i, v := range ge.Causes {
-        sep := fmt.Sprintf("C%d: ",i)
+        sep := fmt.Sprintf("C%d: ", i)
         buffer.WriteString(sep + PrettyPrintStruct(v) + "\n")
     }
     return buffer.String()
 }
 
-func (ge * GenericError) parentToString() string {
+func (ge *GenericError) parentToString() string {
     if ge.Parent == nil {
         return ""
     }
     var buffer bytes.Buffer
     buffer.WriteString("Parent:\n")
-    buffer.WriteString(ge.Parent.DebugReport())
+    parent, err := ge.ParentError()
+    if err == nil {
+        buffer.WriteString(parent.DebugReport())
+    } else {
+        buffer.WriteString("Cannot deserialize parent error:" + err.Error() + "\n")
+    }
     return buffer.String()
 }
 
-func (ge * GenericError) Error() string {
+func (ge *GenericError) Error() string {
     return fmt.Sprintf("[%s] %s", ge.ErrorType, ge.Message)
 }
 
 // Type returns the ErrorType associated with the current DaishoError.
-func (ge * GenericError) Type() ErrorType {
+func (ge *GenericError) Type() ErrorType {
     return ge.ErrorType
 }
 
 // DebugReport returns a detailed error report including the stack information.
-func (ge * GenericError) DebugReport() string {
+func (ge *GenericError) DebugReport() string {
     return fmt.Sprintf("%s\n%s\n%s\n%s\n%s",
         ge.Error(), ge.paramsToString(), ge.causesToString(), ge.StackToString(), ge.parentToString())
 }
 
 // StackTrace returns an array with the calling stack that created the error.
-func (ge * GenericError) StackTrace() [] StackEntry {
+func (ge *GenericError) StackTrace() [] StackEntry {
     return ge.Stack
 }
-
 
 // AsDaishoError checks an error. If it is nil, it returns nil, if not, it will create an equivalent GenericError
 func AsDaishoError(err error, msg string) DaishoError {
@@ -163,7 +181,6 @@ func AsDaishoErrorWithParams(err error, msg string, params ... interface{}) Dais
     }
     return nil
 }
-
 
 // GetStackTrace retrieves the calling stack and transform that information into an array of StackEntry.
 func GetStackTrace() [] StackEntry {
@@ -190,11 +207,11 @@ func ErrorsToString(errors []error) [] string {
 }
 
 // PrettyPrintStruct aims to produce a pretty print of a giving structure by analyzing it.
-func PrettyPrintStruct(data interface {}) string {
+func PrettyPrintStruct(data interface{}) string {
     v := reflect.ValueOf(data)
     method := v.MethodByName("String")
     if method.IsValid() && method.Type().NumIn() == 0 && method.Type().NumOut() == 1 &&
-        method.Type().Out(0).Kind() == reflect.String{
+        method.Type().Out(0).Kind() == reflect.String {
         result := method.Call([]reflect.Value{})
         return result[0].String()
     }
@@ -207,45 +224,44 @@ func PrettyPrintStruct(data interface {}) string {
 //     msg The error message.
 //   returns:
 //     An EntityError.
-func NewEntityError(entity interface{}, msg string, causes ...error) * GenericError {
-    params := make([] interface{}, 0)
-    params = append(params, entity)
-    return &GenericError{
-            EntityErrorType,
-            msg,
-            params,
-            ErrorsToString(causes),
-            nil,
-            GetStackTrace()}
-}
+func NewEntityError(entity interface{}, msg string, causes ...error) *GenericError {
+    params := make([] string, 0)
+    err := &GenericError{
+        EntityErrorType,
+        msg,
+        params,
+        ErrorsToString(causes),
+        nil,
+        GetStackTrace()}
 
+    return err.WithParams(entity)
+}
 
 // NewConnectionError creates a new DaishoError of type Connection.
 //   params:
 //     msg The error message.
 //   returns:
 //     An EntityError.
-func NewConnectionError(msg string, causes ...error) * GenericError {
+func NewConnectionError(msg string, causes ...error) *GenericError {
     return &GenericError{
-            ConnectionErrorType,
-            msg,
-        make([] interface{}, 0),
-            ErrorsToString(causes),
-            nil,
-            GetStackTrace()}
+        ConnectionErrorType,
+        msg,
+        make([] string, 0),
+        ErrorsToString(causes),
+        nil,
+        GetStackTrace()}
 }
 
 // NewOperationError creates a new OperationError.
-func NewOperationError(msg string, causes ... error) * GenericError {
+func NewOperationError(msg string, causes ... error) *GenericError {
     return &GenericError{
-            OperationErrorType,
-            msg,
-            make([] interface{}, 0),
-            ErrorsToString(causes),
-            nil,
-            GetStackTrace()}
+        OperationErrorType,
+        msg,
+        make([] string, 0),
+        ErrorsToString(causes),
+        nil,
+        GetStackTrace()}
 }
-
 
 // FromJSON unmarshalls a byte array with the JSON representation into a DaishoError of the correct type.
 //   params:

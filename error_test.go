@@ -10,6 +10,7 @@ import (
     "fmt"
     "strings"
     "testing"
+    "encoding/json"
 )
 
 func callerGetStackTrace() []StackEntry {
@@ -28,7 +29,8 @@ func TestGetStackTrace(t *testing.T) {
 type testPrettyStruct struct {
     msg string
 }
-func (ss * testPrettyStruct) String() string {
+
+func (ss *testPrettyStruct) String() string {
     return "PRETTY " + ss.msg
 }
 
@@ -104,4 +106,129 @@ func TestDP1092(t *testing.T) {
     if err != nil {
         t.Error("Should be nil")
     }
+}
+
+type MockStruct struct {
+    A string
+    B bool
+    C int
+}
+
+func NewMockStruct() *MockStruct {
+    return &MockStruct{A: "aa", B: true, C: 10}
+}
+
+func TestDP1283(t *testing.T) {
+    data := NewMockStruct()
+    msg := "error valid parent"
+    sysError := NewGenericError(msg).WithParams(NewMockStruct()).
+        WithParams(NewGenericError("prb")).CausedBy(NewGenericError("Super parent"))
+
+    err := NewGenericError("error valid").WithParams("id1").WithParams(data).CausedBy(sysError)
+
+    debugReport := err.DebugReport()
+
+    result, errSer := json.Marshal(err)
+
+    if errSer != nil {
+        t.Error("serialization must work")
+    }
+
+    errRecover := &GenericError{}
+    errDes := json.Unmarshal(result, errRecover)
+    if errDes != nil {
+        t.Error("deserialization must work")
+    }
+    parent, errParent := errRecover.ParentError()
+    if errParent != nil {
+        t.Error("recover parent error must work")
+    }
+    if parent.Error() != sysError.Error() {
+        t.Error("error must be equal")
+    }
+    debugReportRecover := errRecover.DebugReport()
+    println(debugReportRecover)
+    println(debugReport)
+    if debugReport != debugReportRecover {
+        t.Error("debug report must be equals")
+    }
+
+}
+
+func TestDP1283UsingFromJson(t *testing.T) {
+    data := NewMockStruct()
+    sysError := NewGenericError("error valid")
+
+    err := NewGenericError("error valid").WithParams("id1").WithParams(data).CausedBy(sysError)
+
+    result, errSer := json.Marshal(err)
+
+    if errSer != nil {
+        t.Error("Serialization must work")
+    }
+
+    errRecover, errDes := FromJSON(result)
+    if errDes != nil {
+        t.Error("Deserialization must work")
+    }
+    if errRecover == nil {
+        t.Error("Recover err is not empty")
+    }
+
+}
+
+func TestDP1283WithoutObject(t *testing.T) {
+    sysError := NewGenericError("error valid")
+
+    err := NewGenericError("error valid").WithParams("id1").CausedBy(sysError)
+
+    result, errSer := json.Marshal(err)
+
+    if errSer != nil {
+        t.Error("Serialization must work")
+    }
+
+    errRecover := &GenericError{}
+    errDes := json.Unmarshal(result, errRecover)
+
+    if errDes != nil {
+        t.Error("Deserialization must work")
+    }
+
+}
+
+func TestDP1283WithoutParams(t *testing.T) {
+    sysError := NewGenericError("error valid")
+
+    err := NewGenericError("error valid").CausedBy(sysError)
+
+    result, errSer := json.Marshal(err)
+
+    if errSer != nil {
+        t.Error("Serialization must work")
+    }
+
+    errRecover := &GenericError{}
+    errDes := json.Unmarshal(result, errRecover)
+    if errDes != nil {
+        t.Error("Deserialization must work")
+    }
+
+}
+
+func TestDP1283WithoutAnything(t *testing.T) {
+    err := NewGenericError("error valid")
+
+    result, errSer := json.Marshal(err)
+
+    if errSer != nil {
+        t.Error("Serialization must work")
+    }
+
+    errRecover := &GenericError{}
+    errDes := json.Unmarshal(result, errRecover)
+    if errDes != nil {
+        t.Error("Deserialization must work")
+    }
+
 }

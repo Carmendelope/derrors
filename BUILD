@@ -8,10 +8,10 @@ gazelle(
     ],
     command = "fix",
     external = "vendored",
-    prefix = "github.com/daishogroup/derror",
+    prefix = "github.com/nalej/derror",
 )
 
-go_prefix("github.com/daishogroup/derror")
+go_prefix("github.com/nalej/derror")
 
 go_library(
     name = "go_default_library",
@@ -19,7 +19,6 @@ go_library(
         "enum.go",
         "error.go",
         "interface.go",
-        "messages.go",
         "test_utils.go",
     ],
     visibility = ["//visibility:public"],

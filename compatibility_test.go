@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-// Definition of the error interface.
-
 package derrors
 
-// Error defines the interface for all Daisho-defined errors.
-type Error interface {
-	// Error returns the string representation of the error. Notice that this particular method is required
-	// in order to be be compatible with the default golang error.
-	Error() string
-	// Type returns the ErrorType associated with the current DaishoError.
-	Type() ErrorType
-	// DebugReport returns a detailed error report including the stack information.
-	DebugReport() string
-	// StackTrace returns an array with the calling stack that created the error.
-	StackTrace() []StackEntry
+import (
+	"fmt"
+	"testing"
+)
+
+func generateCompatibleError() error {
+	return NewOperationError("This is a test")
+}
+
+// Test the compatibility with the default error interface.
+func TestCompatibility(t *testing.T) {
+
+	err := generateCompatibleError()
+	assertTrue(t, err != nil, "expecting error")
+	fmt.Println(err)
+
 }

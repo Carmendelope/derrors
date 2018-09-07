@@ -159,7 +159,7 @@ func (ge *GenericError) parentToString() string {
 	return buffer.String()
 }
 
-func (ge *GenericError) String() string {
+func (ge *GenericError) Error() string {
 	return fmt.Sprintf("[%s] %s", ge.ErrorType, ge.Message)
 }
 
@@ -171,7 +171,7 @@ func (ge *GenericError) Type() ErrorType {
 // DebugReport returns a detailed error report including the stack information.
 func (ge *GenericError) DebugReport() string {
 	return fmt.Sprintf("%s\n%s\n%s\n%s\n%s",
-		ge.String(), ge.paramsToString(), ge.causesToString(), ge.StackToString(), ge.parentToString())
+		ge.Error(), ge.paramsToString(), ge.causesToString(), ge.StackToString(), ge.parentToString())
 }
 
 // StackTrace returns an array with the calling stack that created the error.

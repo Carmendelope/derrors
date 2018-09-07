@@ -84,11 +84,11 @@ func TestEntityError(t *testing.T) {
 	parent := errors.New("golang error")
 	parent2 := errors.New("previous error")
 	e := NewEntityError(basicEntity, "I/O error", parent, parent2)
-	errorMsg := e.String()
+	errorMsg := e.Error()
 	assertEquals(t, "[Entity] I/O error", errorMsg, "Message should match")
 	detailedError := e.DebugReport()
 	fmt.Println(detailedError)
-	fmt.Println("String(): " + e.String())
+	fmt.Println("String(): " + e.Error())
 }
 
 func TestAsError(t *testing.T) {
@@ -156,7 +156,7 @@ func TestDP1283(t *testing.T) {
 	if errParent != nil {
 		t.Error("recover parent error must work")
 	}
-	if parent.String() != sysError.String() {
+	if parent.Error() != sysError.Error() {
 		t.Error("error must be equal")
 	}
 	debugReportRecover := errRecover.DebugReport()

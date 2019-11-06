@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Daisho
+ * Copyright 2019 Nalej
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,12 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-
-// Definition of the supported types of error. Based on https://godoc.org/google.golang.org/grpc/codes
 
 package derrors
 
+// ErrorType with the definition of the supported types of error. Based on https://godoc.org/google.golang.org/grpc/codes
 type ErrorType int
 
 const (
@@ -38,6 +38,7 @@ const (
 	Unauthenticated
 )
 
+// ErrorTypesValues associating the string representation of an error with its enum code.
 var ErrorTypesValues = map[string]ErrorType{
 	"Generic":            Generic,
 	"Canceled":           Canceled,
@@ -56,6 +57,7 @@ var ErrorTypesValues = map[string]ErrorType{
 	"Unauthenticated":    Unauthenticated,
 }
 
+// ErrorTypeNames map associating error type with its string representation.
 var ErrorTypeNames = map[ErrorType]string{
 	Generic:            "Generic",
 	Canceled:           "Canceled",
@@ -75,10 +77,6 @@ var ErrorTypeNames = map[ErrorType]string{
 }
 
 // ValidErrorType checks the type enum to determine if the string belongs to the enumeration.
-//   params:
-//     errorType The type to be checked
-//   returns:
-//     Whether it is contained in the enum.
 func ValidErrorType(errorType ErrorType) bool {
 	_, exists := ErrorTypeNames[errorType]
 	return exists

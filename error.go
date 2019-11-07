@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Daisho
+ * Copyright 2019 Nalej
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,10 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-
-// Definition of the generic error.
-// Notice that stack traces are not serialized.
 
 package derrors
 
@@ -38,11 +36,7 @@ type StackEntry struct {
 	Line int
 }
 
-// NewStackEntry creates a new stack entry.
-//   params:
-//     functionName The name of the calling function.
-//     file The name of the file where the function is located.
-//     line The line in the file.
+// NewStackEntry creates a new stack entry for a function on a given file:line.
 func NewStackEntry(functionName string, file string, line int) *StackEntry {
 	return &StackEntry{functionName, file, line}
 }
@@ -157,6 +151,7 @@ func (ge *GenericError) parentToString() string {
 	return buffer.String()
 }
 
+// Error returns the simplyfied golang error interface value.
 func (ge *GenericError) Error() string {
 	return fmt.Sprintf("[%s] %s", ErrorTypeAsString(ge.ErrorType), ge.Message)
 }
@@ -231,6 +226,7 @@ func PrettyPrintStruct(data interface{}) string {
 	return fmt.Sprintf("%#v", data)
 }
 
+// NewError creates a new GenericError with a given type.
 func NewError(errorType ErrorType, msg string, causes ...error) *GenericError {
 	return &GenericError{
 		errorType,
@@ -407,11 +403,6 @@ func NewUnauthenticatedError(msg string, causes ...error) *GenericError {
 }
 
 // FromJSON unmarshalls a byte array with the JSON representation into an Error of the correct type.
-//   params:
-//     data The byte array with the serialized JSON.
-//   returns:
-//     An Error if the data can be unmarshalled.
-//     A Golang error if the unmarshal operation fails.
 func FromJSON(data []byte) (Error, error) {
 	genericError := &GenericError{}
 	err := json.Unmarshal(data, &genericError)
